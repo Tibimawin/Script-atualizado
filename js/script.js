@@ -133,16 +133,20 @@ class mountDataBase {
     async verificarVideo(url) {
         let targetUrl = url;
 
-        // Se estiver no Vercel, passa pelo proxy para evitar Mixed Content (HTTP em HTTPS)
-        if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && !window.location.hostname.startsWith('192.168.')) {
-            targetUrl = `/api/proxy?url=${encodeURIComponent(url)}`;
+        // Se estiver em HTTPS (Vercel), OBRIGATORIAMENTE passa pelo proxy
+        if (window.location.protocol === 'https:') {
+            targetUrl = `/api/proxy?url=${encodeURIComponent(url)}&v=${Date.now()}`;
         }
 
         try {
-            const response = await fetch(targetUrl, { method: 'HEAD' });
-            return response.ok;
+            const response = await fetch(targetUrl, {
+                method: 'GET',
+                headers: { 'Range': 'bytes=0-0' },
+                cache: 'no-store'
+            });
+            return response.ok || response.status === 206;
         } catch (error) {
-            console.error("Erro ao verificar vídeo via proxy/fetch:", error);
+            console.error("Erro ao verificar vídeo:", error);
             return false;
         }
     }
