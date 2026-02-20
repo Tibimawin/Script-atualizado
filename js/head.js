@@ -122,8 +122,8 @@ if (user_vps === 0) {
 async function verificarVideo(url) {
     let targetUrl = url;
 
-    // Se estiver no Vercel (hostname não local), passa pelo proxy para evitar Mixed Content (HTTP em HTTPS)
-    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && !window.location.hostname.startsWith('192.168.')) {
+    // Se estiver em HTTPS, OBRIGATORIAMENTE passa pelo proxy para evitar Mixed Content
+    if (window.location.protocol === 'https:') {
         targetUrl = `/api/proxy?url=${encodeURIComponent(url)}&v=${Date.now()}`;
     }
 
@@ -655,8 +655,8 @@ async function envio(index, lista_eps_quebrada) {
 
     let urlDeEpisodios = `${url_base}/api/database/rows/table/${id_episodio}/batch/?user_field_names=true`;
 
-    // Se estiver rodando no Vercel, usa o proxy
-    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && !window.location.hostname.startsWith('192.168.')) {
+    // Se estiver em HTTPS, usa o proxy
+    if (window.location.protocol === 'https:') {
         urlDeEpisodios = `/api/proxy?url=${encodeURIComponent(urlDeEpisodios)}`;
     }
 
@@ -694,8 +694,8 @@ async function cadastrarBaseRow() {
 
     let urlRequest = `${url_base}/api/database/rows/table/${id_conteudo}/batch/?user_field_names=true`;
 
-    // Se estiver rodando no Vercel, usa o proxy
-    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && !window.location.hostname.startsWith('192.168.')) {
+    // Se estiver em HTTPS, usa o proxy
+    if (window.location.protocol === 'https:') {
         urlRequest = `/api/proxy?url=${encodeURIComponent(urlRequest)}`;
     }
 
@@ -767,7 +767,7 @@ async function buscaNameBaseRow(value) {
 
     let targetUrl = `${url_base}/api/database/rows/table/${id_conteudo}/?user_field_names=true&filter__field_${coluna_Nome_Conteudo}__equal=${encodeURIComponent(value)}`;
 
-    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && !window.location.hostname.startsWith('192.168.')) {
+    if (window.location.protocol === 'https:') {
         targetUrl = `/api/proxy?url=${encodeURIComponent(targetUrl)}&v=${Date.now()}`;
     }
 

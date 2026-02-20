@@ -5,38 +5,33 @@ module.exports = async (req, res) => {
         return res.status(400).json({ error: 'URL is required' });
     }
 
-    // CORS Headers
+    // Resposta imediata para Preflight do navegador
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, HEAD');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
+    res.setHeader('Access-Control-Allow-Headers', '*');
 
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
 
     try {
-        console.log(`Proxying request: ${req.method} ${url}`);
+        const fetchOptions = {
+            method: req.method,
+            headers: {}
+        };
 
-        // Coleta headers de forma robusta
-        const headers = {};
-        const headerKeys = ['authorization', 'content-type', 'accept'];
+        // Repassa TODOS os cabeçalhos que o navegador enviar, exceto os de controle do Vercel/Host
+        const excludeList = ['host', 'connection', 'x-vercel-id', 'x-vercel-forwarded-for', 'x-real-ip', 'forwarded', 'origin', 'referer'];
 
-        headerKeys.forEach(key => {
-            const val = req.headers[key];
-            if (val) {
-                // Força o nome do header conforme esperado por muitas APIs (Case-Sensitive em alguns casos)
-                const normalizedKey = key === 'authorization' ? 'Authorization' :
-                    key === 'content-type' ? 'Content-Type' : key;
-                headers[normalizedKey] = val;
-                console.log(`Forwarding header: ${normalizedKey}`);
+        Object.keys(req.headers).forEach(key => {
+            if (!excludeList.includes(key.toLowerCase())) {
+                // Preserva o nome do cabeçalho ou capitaliza o Authorization que é o mais sensível
+                const targetKey = key.toLowerCase() === 'authorization' ? 'Authorization' : key;
+                fetchOptions.headers[targetKey] = req.headers[key];
             }
         });
 
-        const fetchOptions = {
-            method: req.method,
-            headers: headers
-        };
-
+        // Se houver corpo na requisição, passamos adiante
         if (req.method !== 'GET' && req.method !== 'HEAD' && req.body) {
             fetchOptions.body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
         }
@@ -44,17 +39,16 @@ module.exports = async (req, res) => {
         const response = await fetch(url, fetchOptions);
         const data = await response.text();
 
-        console.log(`Target responded with status: ${response.status}`);
-
         // Tentar enviar como JSON se for, caso contrário enviar como texto
         try {
             const jsonData = JSON.parse(data);
             res.status(response.status).json(jsonData);
         } catch (e) {
+            // Repassa o status do servidor original (ex: 401, 200, 206)
             res.status(response.status).send(data);
         }
     } catch (error) {
-        console.error('Proxy Error:', error);
-        res.status(500).json({ error: 'Proxy implementation error', details: error.message });
+        console.error('Proxy Fatal Error:', error);
+        res.status(500).json({ error: 'Proxy Error', details: error.message });
     }
 };
