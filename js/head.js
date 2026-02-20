@@ -119,32 +119,22 @@ if (user_vps === 0) {
 
 }
 
-//ESSA FUNÇÃO VERIFICA QUAL LINK ESTA ONLINE
 async function verificarVideo(url) {
-    return new Promise((resolve) => {
-        const video = document.createElement('video');
-        video.muted = true; // Necessário para carregamento em segundo plano no celular
-        video.setAttribute('playsinline', ''); // Necessário para iOS
-        video.src = url;
+    let targetUrl = url;
 
-        const timeout = setTimeout(() => {
-            video.src = "";
-            resolve(false);
-            video.remove();
-        }, 5000); // 5 segundos de limite
+    // Se estiver no Vercel, passa pelo proxy para evitar Mixed Content (HTTP em HTTPS)
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && !window.location.hostname.startsWith('192.168.')) {
+        targetUrl = `/api/proxy?url=${encodeURIComponent(url)}`;
+    }
 
-        video.onloadeddata = () => {
-            clearTimeout(timeout);
-            resolve(true);
-            video.remove();
-        };
-        video.onerror = () => {
-            clearTimeout(timeout);
-            resolve(false);
-            video.remove();
-        };
-        video.load();
-    });
+    try {
+        const response = await fetch(targetUrl, { method: 'HEAD' });
+        // Se o status for entre 200 e 299, o arquivo existe
+        return response.ok;
+    } catch (error) {
+        console.error("Erro ao verificar vídeo via proxy/fetch:", error);
+        return false;
+    }
 }
 
 //ESSA FUNLÇÃO INICIA O PROCESSO SALVANDO OS DADOS PRINCIPAIS DENTRO DAS VARIAVEIS GLOBAIS

@@ -5,39 +5,38 @@ module.exports = async (req, res) => {
         return res.status(400).json({ error: 'URL is required' });
     }
 
-    // Extrair headers relevantes para passar adiante
-    const headers = { ...req.headers };
-    delete headers.host;
-    delete headers['x-vercel-id'];
-    delete headers['x-vercel-forwarded-for'];
-    delete headers['x-real-ip'];
-    delete headers['forwarded'];
+    // Configuração de CORS para permitir que o navegador envie o Token
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, HEAD');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
+
+    // Se for um preflight do navegador, responde ok logo de cara
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
 
     try {
         const fetchOptions = {
             method: req.method,
-            headers: {
-                ...headers,
-                'Content-Type': req.headers['content-type'] || 'application/json',
-            }
+            headers: {}
         };
 
-        // Se houver corpo na requisição, passá-lo adiante
+        // Copia os cabeçalhos essenciais do pedido original
+        // Importante: Vercel pode colocar os nomes em minúsculo
+        const interestingHeaders = ['authorization', 'content-type', 'accept'];
+        interestingHeaders.forEach(h => {
+            if (req.headers[h]) {
+                fetchOptions.headers[h] = req.headers[h];
+            }
+        });
+
+        // Se houver corpo na requisição (POST/PUT), passa adiante
         if (req.method !== 'GET' && req.method !== 'HEAD' && req.body) {
             fetchOptions.body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
         }
 
         const response = await fetch(url, fetchOptions);
         const data = await response.text();
-
-        // Repassar os headers de CORS
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        res.setHeader('Access-Control-Allow-Headers', '*');
-
-        if (req.method === 'OPTIONS') {
-            return res.status(200).end();
-        }
 
         // Tentar enviar como JSON se for, caso contrário enviar como texto
         try {
@@ -47,7 +46,7 @@ module.exports = async (req, res) => {
             res.status(response.status).send(data);
         }
     } catch (error) {
-        console.error('Proxy error:', error);
+        console.error('Proxy logic error:', error);
         res.status(500).json({ error: 'Proxy error', details: error.message });
     }
 };
