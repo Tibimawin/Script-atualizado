@@ -1,0 +1,33 @@
+#tela-1 {
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+#tela-1 > textarea {
+    width: 60%;
+    height: 100px;
+    background-color: rgb(246, 247, 248);
+    outline: none;
+    padding: 10px;
+}
+
+.btn-salvar {
+
+    padding: 15px 5px;
+    border-radius: 10px;
+    cursor: pointer;
+    
+}
+
+@media (max-width : 480px) {
+    #tela-1 > textarea {
+        width: 100%;
+    }
+}
+
+#tipo-conteudo {
+    padding: 10px 10px;
+}

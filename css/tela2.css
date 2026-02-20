@@ -1,0 +1,15 @@
+#tela-2 {
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.content {
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+
+}
+

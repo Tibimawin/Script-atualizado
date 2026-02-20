@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <title>Gerenciamento de Filmes e Séries</title>
+
+    <style>
+        /* Estilos Reset/Base */
+        * {
+            padding: 0px;
+            margin: 0px;
+            box-sizing: border-box;
+        }
+
+        /* Tema Escuro Global */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #212121;
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+
+        /* Estilos do Status e Nome (Header) */
+        #status {
+            width: 100vw;
+            padding: 20px 0px;
+            text-align: center;
+            font-size: 2rem; /* Reduzido para melhor visualização */
+            color: #e0e0e0;
+        }
+
+        .name {
+            width: 100vw;
+            padding: 10px 0px 20px;
+            text-align: center;
+            font-size: 1.5rem; /* Reduzido para melhor visualização */
+            color: #76ff03;
+        }
+
+        h2 {
+            text-align: center;
+            color: #76ff03;
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        section {
+            margin: 20px auto;
+            padding: 20px;
+            max-width: 800px;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        /* Estilos da Tela 1 */
+        #tela-1 {
+            text-align: center;
+        }
+
+        #lista {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #333;
+            background-color: #333;
+            color: #e0e0e0;
+            resize: vertical;
+        }
+
+        .input-group label {
+            display: block;
+            text-align: left;
+            margin-bottom: 5px;
+            color: #e0e0e0;
+            font-weight: bold;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #555;
+            background-color: #333;
+            color: #e0e0e0;
+            box-sizing: border-box;
+        }
+
+        .btn-salvar,
+        .btn-buscar {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #76ff03;
+            color: #1e1e1e;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-salvar:hover,
+        .btn-buscar:hover {
+            background-color: #9cff57;
+        }
+
+        /* Estilos da Tela 2 (Busca) */
+        #tela-2 {
+            display: none;
+        }
+
+        .content-busca {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            text-align: center;
+        }
+
+        .card-busca {
+            background-color: #2a2a2a;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .card-busca:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-busca img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .card-busca p {
+            font-size: 0.9em;
+            color: #bdbdbd;
+            height: 40px;
+            overflow: hidden;
+        }
+
+        /* Estilos da Tela 3 (Formulário) */
+        #tela-3 {
+            display: none;
+        }
+
+        #tela-3 div {
+            margin-bottom: 15px;
+        }
+
+        #tela-3 label {
+            display: block;
+            margin-bottom: 5px;
+            color: #76ff03;
+            font-weight: bold;
+        }
+
+        #tela-3 input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #555;
+            background-color: #333;
+            color: #e0e0e0;
+        }
+
+        /* Estilos da Tela 4 e 5 */
+        #tela-4, #tela-5 {
+            display: none;
+            text-align: center;
+        }
+        
+        #tela-4 button, #tela-5 button {
+            padding: 15px 30px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div id="status"></div>
+        <div class="name"></div>
+    </header>
+
+    <section id="tela-1">
+        <h2>Passo 1: Lista de Conteúdo</h2>
+        <div class="input-group">
+            <label for="lista">Cole a lista de títulos (separados por linha)</label>
+            <textarea id="lista" placeholder="Título 1&#10;Título 2&#10;Título 3" required></textarea>
+        </div>
+        <div class="input-group">
+            <label for="tipo-conteudo">Tipo de Conteúdo</label>
+            <select id="tipo-conteudo">
+                <option value="movie">Filme</option>
+                <option value="tv">Série</option>
+            </select>
+        </div>
+        <button class="btn-salvar">Processar Lista</button>
+    </section>
+
+    <section id="tela-2">
+        <h2>Passo 2: Selecione o Título Correto</h2>
+        <div id="contentBusca" class="content-busca">
+        </div>
+    </section>
+
+    <section id="tela-3">
+        <h2>Passo 3: Dados Validados (Aguardando Verificação)</h2>
+        <div class="content-form">
+            <div>
+                <label for="nome">Nome</label>
+                <input id="nome" type="text" readonly>
+            </div>
+            <div>
+                <label for="capa">Capa (URL)</label>
+                <input id="capa" type="text" readonly>
+            </div>
+            <div>
+                <label for="categoria">Categoria</label>
+                <input id="categoria" type="text" readonly>
+            </div>
+            <div>
+                <label for="sinopse">Sinopse</label>
+                <input id="sinopse" type="text" readonly>
+            </div>
+            <div>
+                <label for="link">Link do Player Base</label>
+                <input id="link" type="text" readonly>
+            </div>
+            <div>
+                <label for="tipo">Tipo</label>
+                <input id="tipo" type="text" readonly>
+            </div>
+            <div>
+                <label for="idioma">Idioma</label>
+                <input id="idioma" type="text" readonly>
+            </div>
+            <div>
+                <label for="temporadaTotal">Temporada Total</label>
+                <input id="temporadaTotal" type="text" readonly>
+            </div>
+            <div>
+                <label for="listaEps">Lista de Episódios</label>
+                <input id="listaEps" type="text" readonly>
+            </div>
+            <button id="btn-baserow" class="btn-salvar" style="display:none;">Cadastrar (Debug)</button>
+        </div>
+    </section>
+
+    <section id="tela-4">
+        <h2>Passo 4: Pronto para Cadastrar</h2>
+        <button onclick="cadastrarBaseRow()">Cadastrar no Baserow</button>
+    </section>
+
+    <section id="tela-5">
+        <h2>Passo 5: Título Não Encontrado / Link Inválido</h2>
+        <button onclick="reiniciar()">Pular Conteúdo / Próximo</button>
+    </section>
+
+    <script>
+        /* ================================================= */
+        /* VARIÁVEIS E CONSTANTES GLOBAIS */
+        /* ================================================= */
+        let init = 0;
+        let lista = null;
+        let tipo = null; // Usado para o tipo de busca (movie/tv)
+        
+        const data = {
+            items : []
+        }
+
+        let serieConteudo = {
+            nome : null,
+            capa : null,
+            categoria : null,
+            sinopse : null,
+            link : null,
+            tipo : null,
+            idioma : null,
+            lista_temporadas : null,
+            view : 0,
+            listaEps : []
+        }
+
+        // LINKS BASE DE FILMES E SÉRIES (Mantidos conforme o original)
+        const linkBaseFilmes = [
+            'http://fhd1.oneplayer.site/toktergfer32tgdsvsdven/FHD1/',
+            'http://fhd1.oneplayer.site/ertg43r5g34ty34yt543t43wer234t34t345/FHD10/',
+            'http://fhd2.oneplayer.site/toktergfer32tgdsvsdven/FHD2/',
+            'http://fhd3.oneplayer.site/toktergfer32tgdsvsdven/FHD3/',
+            'http://fhd4.oneplayer.site/343rt342wtg34wetg34retg4rghy5rh/FHD4/',
+            'http://fhd5.oneplayer.site/45y5ty5rtg345ert45r3t345ty345/FHD5/',
+            'http://fhd6.oneplayer.site/toktergfer32tgdsvsdven/FHD6/',
+            'http://fhd7.oneplayer.site/toktergfer32tgdsvsdven/FHD7/',
+            'http://fhd8.oneplayer.site/toktergfer32tgdsvsdven/FHD8/',
+            'http://fhd9.oneplayer.site/toktergfer32tgdsvsdven/FHD9/',
+            'http://fhd4.oneplayer.site/toktergfer32tgdsvsdven/FHD4/',
+            'http://fhd10.oneplayer.site/343rt342wtg34wetg34retg4rghy5rh/FHD10/',
+            'http://fhd11.oneplayer.site/343rt342wtg34wetg34retg4rghy5rh/FHD11/',
+            'http://fhd12.oneplayer.site/343rt342wtg34wetg34retg4rghy5rh/FHD12/',
+            'http://fhd5.oneplayer.site/tokIadasfIIlIlenIlIlIsf/FHD5/',
+            'http://fhd1.oneplayer.site/ertg43r5g34ty34yt543t43wer234t34y3s7/FHD3/',
+            'http://fhd1.oneplayer.site/ertg43r5g34ty34yt543t43wer234t34t345/FHD3/',
+            'http://fhd4.oneplayer.site/343rt342wtg34wetg34retg4rgh5kh4/FHD4/',
+            'http://fhd1.oneplayer.site/ertg43r5g34ty34yt543t43wer234t34y3s7/FHD10/',
+            'http://hd5.oneplayer.site/343rt342wtg34wetg34retghksi68ssk/FHD5/',
+            'http://hd5.oneplayer.site/FHD5/',
+            'http://hd5.oneplayer.site/token/FHD5/',
+            'http://fhd1.oneplayer.site/ertg43r5g34ty34yt543t43wer234t34t345/FHD3/',
+            'http://fhd4.oneplayer.site/343rt342wtg34wetg34retg4rghy5rh/FHD4/'
+        ];
+
+        const linkBaseSeries = [
+            'http://fhd1.oneplayer.site.xyz/ertg43r5g34ty34yt543t43wer234t34t345/SHD11/',
+            'http://fhd5.oneplayer.site/45y5ty5rtg345ert45r3t345ty345/SHD12/',
+            'http://shd0.oneplayer.site/rfg54ry435y45y45y45y45y45rt23w4r324wt34tr34t3e4wtfg43/SHD0/',
+            'http://shd2.oneplayer.site/5yu456y45tge4rtfg4w3ertf34t43retg54y65uj65uji/SHD2/',
+            'http://shd1.oneplayer.site/y45y456y45y54eytg345t4rfwserdfwe4rtrf34t65435retyg/SHD1/',
+            'http://shd1.oneplayer.site/sfgerg54yrt/SHD1/',
+            'http://shd0.oneplayer.site/rfg54ry435y45y45y45y45y45rt23w4r324wt34tr34t3e4wtf582/SHD0/',
+            'http://shd8.oneplayer.site/rgdfgret43tfawd32fvdsf/SHD8/',
+            'http://shd0.oneplayer.site/rfg54ry435y45y45y45y45y45rt23w4r324wt34tr34t3e4wtf582/SHD0/',
+            'http://shd8.oneplayer.site/67i567uyh56r4tgyh54rteh45yhg465uhy456ju56l2q/SHD8/',
+            'http://shd1.oneplayer.site/y45y456y45y54eytg345t4rfwserdfwe4rtrf34t65435redso/SHD1/',
+            'http://shd7.oneplayer.site/u657uy56y5r4tfg4r3eftg345tgy45hj456th45tjh456uj56ujhryz3/SHD7/',
+            'http://shd2.oneplayer.site/5yu456y45tge4rtfg4w3ertf34t43retg54y65uj65npw/SHD2/',
+            'http://shd9.oneplayer.site/y456y654uj54tyg34gfwer45r3hj465yh354rtgfwe4rfgtwku51/SHD9/',
+            'http://shd13.oneplayer.site/SHD13/',
+            'http://shd13.oneplayer.site/SHD13/',
+            'http://shd13.oneplayer.site/SHD13/',
+            'http://shd12.oneplayer.site/token/SHD13/',
+            'http://shd2.oneplayer.site/token/SHD2/',
+            'http://shd3.oneplayer.site/token/SHD3/',
+            'http://shd4.oneplayer.site/token/SHD4/',
+            'http://shd5.oneplayer.site/token/SHD5/',
+            'http://shd6.oneplayer.site/token/SHD6/',
+            'http://shd7.oneplayer.site/u657uy56y5r4tfg4r3eftg345tgy45hj456th45tjh456uj56ujhryt5/SHD7/',
+            'http://shd8.oneplayer.site/rgdfgret43tfawd32fvdsf/SHD8/', 
+            'http://shd9.oneplayer.site/y456y654uj54tyg34gfwer45r3hj465yh354rtgfwe4rfgtw34er/SHD9/',
+            'http://shd10.oneplayer.site/token/SHD10/',
+            'http://shd11.oneplayer.site/token/SHD11/',
+            'http://shd12.oneplayer.site/token/SHD12/',
+            'http://shd12.oneplayer.site/token/SHD12/',
+            'http://shd2.oneplayer.site/sfgfe34ew32r/SHD2/',
+            'http://shd7.oneplayer.site/bweregffderfggfdf/SHD7/'
+        ];
+
+        /* ================================================= */
+        /* CLASSE: baseRow (Conexão com a API Baserow) */
+        /* ================================================= */
+        class baseRow {
+            // TOKEN DE API DO BASEROW (Mantenha o seu token privado)
+            token = 'yKeRmUX2p5NSweOl9TAguRF5djLPGKbJ';
+            
+            // ID DA TABELA DE CONTEÚDO
+            TABLE_ID_CONTEUDO = '231423';
+            
+            async buscaElemento(nome) {
+                const encodedNome = encodeURIComponent(nome);
+                const options = {
+                    method : 'GET',
+                    headers : {
+                        Authorization : `Token ${this.token}`
+                    }
+                }
+
+                // URL para buscar por nome (filtro)
+                const urlRequest = `https://api.baserow.io/api/database/rows/table/${this.TABLE_ID_CONTEUDO}/?user_field_names=true&filters={"filter_type":"AND","filters":[{"type":"equal","field":"Nome","value":"${encodedNome}"}],"groups":[]}`;
+
+                const request = await fetch(urlRequest, options);
+
+                if(request.ok) {
+                    const dados = await request.json();
+
+                    if(dados.count == 0 ) {
+                        // Não encontrado, pode cadastrar
+                        return true;
+                    } else {
+                        // Encontrado, já existe
+                        return false;
+                    }
+                } else {
+                    console.error('Erro na busca de elemento no Baserow:', request.status, await request.text());
+                    return 'error';
+                }
+            }
+
+            async createdConteudo(dados) {
+                let corpo = JSON.stringify(dados);
+                const options = {
+                    method : 'POST',
+                    headers : {
+                        Authorization : `Token ${this.token}`,
+                        'Content-Type' : 'application/json'
+                    },
+                    body : corpo
+                }
+
+                // URL para criar uma nova linha na tabela
+                const urlRequest = `https://api.baserow.io/api/database/rows/table/${this.TABLE_ID_CONTEUDO}/?user_field_names=true`;
+
+                const request = await fetch(urlRequest, options);
+
+                if (request.ok) {
+                    return true;
+                } else {
+                    console.error('Erro ao criar conteúdo no Baserow:', request.status, await request.text());
+                    return false;
+                }
+            }
+        }
+
+        /* ================================================= */
+        /* CLASSE: mountDataBase (Conexão TMDB e Validação de Link) */
+        /* ================================================= */
+        class mountDataBase {
+            constructor(linkFilmes, linkSeries) {
+                this.linkFilmes = linkFilmes;
+                this.linkSeries = linkSeries;
+            }
+            
+            // Faz uma busca por um filme ou série no TMDB
+            async tmdbSearch(tipo, title) {
+                const encodedTitle = encodeURIComponent(title);
+                const options = {
+                    method: 'GET',
+                    headers: {
+                        accept: 'application/json',
+                        // Bearer Token do TMDB - ATUALIZADO
+                        Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4NDY3YmIzZGMxN2VjYTM3ODMyOWRjMDkwNjZkYzRhNCIsIm5iZiI6MTc1MTU1MTI0OC41NzUsInN1YiI6IjY4NjY4ZDEwNTBhMGRjYjAyYmMxMThkZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.XNlpVp_chznD91LujFqDWQ6QiRJeESj40SX0utVQy3k'
+                    }
+                };
+                    
+                let url = `https://api.themoviedb.org/3/search/${tipo}?query=${encodedTitle}&include_adult=false&language=pt-BR&page=1`;
+
+                const request = await fetch(url, options);
+
+                if(request.ok) {
+                    const dados = await request.json();
+                    return dados.results;
+                } else {
+                    console.error('Erro na busca TMDB:', request.status, await request.text());
+                    return false;
+                }
+            }
+
+            // Busca os detalhes do conteúdo pelo ID e tenta validar o link
+            async tmdbSearchId(tipo, id, obj) {
+                const options = {
+                    method: 'GET',
+                    headers: {
+                        accept: 'application/json',
+                        Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4NDY3YmIzZGMxN2VjYTM3ODMyOWRjMDkwNjZkYzRhNCIsIm5iZiI6MTc1MTU1MTI0OC41NzUsInN1YiI6IjY4NjY4ZDEwNTBhMGRjYjAyYmMxMThkZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.XNlpVp_chznD91LujFqDWQ6QiRJeESj40SX0utVQy3k'
+                    }
+                };
+
+                let url;
+                if (tipo === 'movie') {
+                    url = `https://api.themoviedb.org/3/movie/${id}?append_to_response=videos,images,external_ids&language=pt-BR`;
+                } else {
+                    url = `https://api.themoviedb.org/3/tv/${id}?append_to_response=videos,images,external_ids&language=pt-BR`;
+                }
+                
+                const request = await fetch(url, options);
+
+                if (request.ok) {
+                    const dados = await request.json();
+                    let categoria = dados.genres.map(g => g.name).join(', ');
+
+                    // === Preenchimento Básico ===
+                    if (tipo === 'movie') {
+                        obj.nome = dados.title;
+                        obj.tipo = 'Filme';
+                        obj.lista_temporadas = null;
+                        
+                        // Busca e validação do link do player para FILMES
+                        for (const element of this.linkFilmes) {
+                            // Tenta DUB
+                            const urlDub = `${element}${dados.id}.mp4`;
+                            if (await this.verificarVideo(urlDub)) {
+                                obj.link = urlDub;
+                                obj.idioma = 'DUB';
+                                break;
+                            }
+                            // Tenta LEG
+                            const urlLeg = `${element}${dados.id}L.mp4`;
+                            if (await this.verificarVideo(urlLeg)) {
+                                obj.link = urlLeg;
+                                obj.idioma = 'LEG';
+                                break;
+                            }
+                        }
+                    } else if (tipo === 'tv') {
+                        obj.nome = dados.name;
+                        obj.tipo = 'Série';
+                        obj.lista_temporadas = dados.number_of_seasons;
+                        
+                        // Array com o número de episódios por temporada (excluindo season 0, se houver)
+                        const listEps = dados.seasons.filter(s => s.season_number > 0).map(s => s.episode_count);
+                        obj.listaEps = [];
+
+                        // Busca e validação do link do player para SÉRIES
+                        for (const element of this.linkSeries) {
+                            // Tenta DUB (Testa o S1E1)
+                            let linkBaseDub = `${element}${dados.id}`;
+                            const urlTesteDub = `${linkBaseDub}/1x1.mp4`;
+                            if (await this.verificarVideo(urlTesteDub)) {
+                                obj.link = linkBaseDub;
+                                obj.idioma = 'DUB';
+                                this.gerarListaDeEpisodios(listEps, obj.link, obj.listaEps);
+                                break;
+                            }
+                            // Tenta LEG (Testa o S1E1L)
+                            let linkBaseLeg = `${element}${dados.id}L`;
+                            const urlTesteLeg = `${linkBaseLeg}/1x1.mp4`;
+                            if (await this.verificarVideo(urlTesteLeg)) {
+                                obj.link = linkBaseLeg;
+                                obj.idioma = 'LEG';
+                                this.gerarListaDeEpisodios(listEps, obj.link, obj.listaEps);
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // Preenchimento de campos comuns
+                    obj.capa = dados.poster_path ? `https://image.tmdb.org/t/p/w500${dados.poster_path}` : 'N/A';
+                    obj.categoria = categoria;
+                    obj.sinopse = dados.overview || 'Sem descrição para esse conteúdo';
+
+                    return true;
+                } else {
+                    console.error('Erro ao buscar detalhes TMDB:', request.status, await request.text());
+                    return false;
+                }
+            }
+
+            // NOVO MÉTODO: Verifica se o link do vídeo está online usando HEAD request (mais rápido e eficiente)
+            async verificarVideo(url) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => {
+                        console.log(`Timeout ao verificar o link: ${url}`);
+                        controller.abort();
+                    }, 5000); // 5 segundos de timeout
+
+                    const response = await fetch(url, {
+                        method: 'HEAD',
+                        mode: 'cors',
+                        signal: controller.signal
+                    });
+
+                    clearTimeout(timeoutId);
+
+                    // Verifica 200 (OK) ou 206 (Conteúdo Parcial)
+                    if (response.ok || response.status === 206) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } catch (error) {
+                    return false;
+                }
+            }
+
+            // Gera a lista de URLs de episódios para séries
+            gerarListaDeEpisodios(listEps, linkBase, listaEps) {
+                // key é o índice, o número da temporada é key + 1
+                listEps.forEach(function (episodeCount, key) {
+                    const seasonNumber = key + 1;
+                    // init é o índice do episódio, o número do episódio é init + 1
+                    for(let init = 0; init < episodeCount; init++) {
+                        const episodeNumber = init + 1;
+                        // Formato do link final do episódio: linkBase/SxE.mp4 (ex: .../ID/1x1.mp4)
+                        listaEps.push(`${linkBase}/${seasonNumber}x${episodeNumber}.mp4`);
+                    }
+                })
+            }
+        }
+
+
+        /* ================================================= */
+        /* LÓGICA PRINCIPAL E CONTROLE DE TELAS */
+        /* ================================================= */
+
+        // INSTÂNCIAS DE CLASSES
+        const baseRowData = new baseRow();
+        const dataBase = new mountDataBase(linkBaseFilmes, linkBaseSeries);
+
+        // FUNÇÕES DE EXIBIÇÃO DE TELA
+        function ocultarTodasTelas() {
+            document.querySelectorAll('section').forEach(section => {
+                section.style.display = 'none';
+            });
+        }
+
+        function exibirTela(id) {
+            ocultarTodasTelas();
+            document.querySelector(id).style.display = 'block';
+        }
+
+        // FUNÇÃO PARA ATUALIZAR O STATUS NA TELA
+        function atualizarStatus(mensagem, nome) {
+            document.querySelector('#status').textContent = mensagem;
+            document.querySelector('.name').textContent = nome;
+        }
+
+        // FUNÇÃO PARA CRIAR ELEMENTOS DE BUSCA NA TELA 2
+        function createElmentBusca(dadosBusca) {
+            let contentBusca = document.querySelector('#contentBusca');
+            contentBusca.innerHTML = '';
+            exibirTela('#tela-2');
+
+            dadosBusca.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card-busca';
+                // Adiciona a função global buscarId com o id do item
+                card.setAttribute('onclick', `buscarId(${item.id})`);
+                
+                const imgSrc = item.poster_path ? `https://image.tmdb.org/t/p/w200${item.poster_path}` : 'https://via.placeholder.com/200x300?text=Sem+Capa';
+                const title = item.title || item.name || 'Título Desconhecido';
+                const releaseDate = item.release_date || item.first_air_date;
+
+                card.innerHTML = `
+                    <img src="${imgSrc}" alt="${title}">
+                    <p><strong>${title}</strong></p>
+                    <p>${releaseDate ? releaseDate.substring(0, 4) : 'N/A'}</p>
+                `;
+                contentBusca.appendChild(card);
+            });
+        }
+
+        // ESSA FUNÇÃO FAZ BUSCA POR ID (chamada ao clicar no card da tela 2)
+        async function buscarId(id) {
+            try {
+                // Tela de validação/loading
+                atualizarStatus('Buscando Link e Detalhes...', lista[init]);
+                
+                let contentBusca = document.querySelector('#contentBusca');
+                contentBusca.innerHTML = '';
+                exibirTela('#tela-3');
+
+                const dadosEncontrados = await dataBase.tmdbSearchId(tipo, id, serieConteudo);
+
+                if (dadosEncontrados) {
+                    if (serieConteudo.link) {
+                        // Link válido encontrado
+                        preencherFormulario(serieConteudo);
+                    } else {
+                        // Dados do TMDB encontrados, mas link inválido
+                        console.log('Link inválido, pulando...');
+                        atualizarStatus('Link Inválido', serieConteudo.nome || lista[init]);
+                        exibirTela('#tela-5');
+                    }
+                } else {
+                    // Erro ao buscar detalhes no TMDB
+                    atualizarStatus('ERRO na Busca de Detalhes', lista[init]);
+                    exibirTela('#tela-5');
+                }
+            } catch (error) {
+                console.error('Erro geral ao buscar ID:', error);
+                atualizarStatus('ERRO Geral', lista[init]);
+                exibirTela('#tela-5');
+            }
+        }
+
+        // ESSA FUNÇÃO PREENCHE O FORMULÁRIO NA TELA 3 E VAI PARA A TELA 4
+        function preencherFormulario(dados) {
+            document.querySelector('#nome').value = dados.nome;
+            document.querySelector('#capa').value = dados.capa;
+            document.querySelector('#categoria').value = dados.categoria;
+            document.querySelector('#sinopse').value = dados.sinopse;
+            document.querySelector('#link').value = dados.link;
+            document.querySelector('#tipo').value = dados.tipo;
+            document.querySelector('#idioma').value = dados.idioma;
+            document.querySelector('#temporadaTotal').value = dados.lista_temporadas || 'N/A';
+            document.querySelector('#listaEps').value = dados.listaEps.length > 0 ? `${dados.listaEps.length} URLs de Episódios geradas (Série)` : 'N/A (Filme)';
+
+            atualizarStatus('Pronto para Cadastrar', dados.nome);
+            exibirTela('#tela-4');
+        }
+
+        // ESSA FUNÇÃO FAZ O CADASTRO FINAL NO BASEROW
+        async function cadastrarBaseRow() {
+            atualizarStatus('Cadastrando...', serieConteudo.nome);
+
+            let conteudo = {
+                Nome: serieConteudo.nome,
+                Capa: serieConteudo.capa,
+                Categoria: serieConteudo.categoria,
+                Sinopse: serieConteudo.sinopse,
+                Link: serieConteudo.link,
+                Tipo: serieConteudo.tipo,
+                Idioma: serieConteudo.idioma,
+                // O Baserow pode ter campos adicionais para temporadas/episódios,
+                // mas usaremos apenas os campos fornecidos.
+            };
+            
+            // Verifica se o conteúdo já existe no Baserow
+            let isUnique = await baseRowData.buscaElemento(serieConteudo.nome);
+
+            if (isUnique === true) {
+                let cadastrado = await baseRowData.createdConteudo(conteudo);
+                if (cadastrado) {
+                    alert('CONTEÚDO CADASTRADO COM SUCESSO!');
+                    data.items.push(conteudo);
+                    reiniciar();
+                } else {
+                    alert('ERRO AO CADASTRAR CONTEÚDO. Verifique o console.');
+                    reiniciar();
+                }
+            } else if (isUnique === false) {
+                alert('CONTEÚDO JÁ CADASTRADO (DUPLICIDADE)');
+                reiniciar();
+            } else {
+                alert('ERRO na verificação de DUPLICIDADE. Verifique o console.');
+                reiniciar();
+            }
+        }
+
+        // ESSA FUNÇÃO INICIALIZA TODO PROCESSO (Busca o próximo item da lista)
+        async function inicializarBusca() {
+            if (init < lista.length) {
+                let nomeAtual = lista[init];
+                atualizarStatus('Buscando...', nomeAtual);
+
+                // Limpa o objeto global para o novo item
+                serieConteudo = {
+                    nome : null, capa : null, categoria : null, sinopse : null,
+                    link : null, tipo : null, idioma : null, lista_temporadas : null,
+                    view : 0, listaEps : []
+                };
+
+                const dadosBusca = await dataBase.tmdbSearch(tipo, nomeAtual);
+
+                if (dadosBusca && dadosBusca.length > 0) {
+                    // Item encontrado, mostra as opções de seleção
+                    serieConteudo.nome = nomeAtual;
+                    createElmentBusca(dadosBusca);
+                } else {
+                    // Não encontrado no TMDB
+                    console.log(`Conteúdo não encontrado no TMDB: ${nomeAtual}`);
+                    atualizarStatus('Não Encontrado no TMDB', nomeAtual);
+                    exibirTela('#tela-5');
+                }
+            } else {
+                // Fim da lista
+                atualizarStatus('PROCESSO CONCLUÍDO', `Total de itens cadastrados: ${data.items.length}`);
+                exibirTela('#tela-1'); // Volta para a tela inicial
+            }
+        }
+
+        // ESSA FUNÇÃO RESETA E REINICIA TODO PROCESSO (Avança para o próximo item)
+        function reiniciar() {
+            // AUMENTANDO MAIS 1 NO VALOR DE INIT PARA PRÓXIMO ELEMENTO SER CONSULTADO
+            init = init + 1;
+
+            // O objeto serieConteudo é redefinido dentro de inicializarBusca antes de ser preenchido
+            // ou dentro de reiniciar(), se o fluxo for reestruturado. Mantenho a redefinição aqui para clareza.
+            serieConteudo = {
+                nome : null, capa : null, categoria : null, sinopse : null,
+                link : null, tipo : null, idioma : null, lista_temporadas : null,
+                view : 0, listaEps : []
+            };
+
+            // Volta para a função principal de busca
+            inicializarBusca();
+        }
+
+        // Inicializa a tela ao carregar e define status
+        ocultarTodasTelas();
+        exibirTela('#tela-1');
+        atualizarStatus('Aguardando Lista', 'Início');
+
+
+        // CONFIGURAÇÃO DO BOTÃO DA TELA 1 PARA PROCESSAR A LISTA (Listener corrigido)
+        document.querySelector('.btn-salvar').addEventListener('click', function() {
+            const listaPura = document.querySelector('#lista').value.trim();
+            tipo = document.querySelector('#tipo-conteudo').value.trim();
+            
+            // Quebra a lista em linhas e filtra linhas vazias
+            lista = listaPura.split('\n').map(item => item.trim()).filter(item => item.length > 0);
+            
+            if (lista.length === 0) {
+                alert('A lista de títulos está vazia!');
+                return;
+            }
+
+            init = 0; // Garante que o contador comece do zero
+            
+            // O processo é iniciado pela função principal
+            inicializarBusca();
+        });
+    </script>
+</body>
+</html>

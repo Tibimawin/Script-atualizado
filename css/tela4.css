@@ -1,0 +1,29 @@
+#tela-4 {
+    width: 100vw;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+#tela-4 > button 
+{
+    padding: 10px 8px;
+    margin-top: 20px;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+#tela-5 {
+    width: 100vw;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+#tela-5 > button 
+{
+    padding: 10px 8px;
+    margin-top: 20px;
+    cursor: pointer;
+    border-radius: 10px;
+}

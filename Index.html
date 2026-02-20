@@ -1,0 +1,273 @@
+~<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <title>Gerenciamento de Filmes e Séries</title>
+
+    <style>
+        /* Tema Escuro Global */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+
+        h2 {
+            text-align: center;
+            color: #76ff03;
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        section {
+            margin: 20px auto;
+            padding: 20px;
+            max-width: 800px;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideUp 0.8s ease-in-out forwards;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+            color: #b0bec5;
+        }
+
+        textarea, input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0 20px 0;
+            border: 1px solid #424242;
+            border-radius: 5px;
+            box-sizing: border-box;
+            background-color: #2e2e2e;
+            color: #e0e0e0;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus, input:focus, select:focus {
+            border-color: #76ff03;
+            outline: none;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        button {
+            display: inline-block;
+            background-color: #76ff03;
+            color: #121212;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #64dd17;
+            transform: scale(1.05);
+        }
+
+        .btn-salvar {
+            width: 100%;
+        }
+
+        /* Animações */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Formulário */
+        .form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .form div {
+            flex: 1 1 calc(50% - 15px);
+            min-width: 200px;
+        }
+
+        /* Destaque de Seções */
+        section#tela-1 {
+            border-left: 5px solid #76ff03;
+        }
+
+        section#tela-2 {
+            border-left: 5px solid #40c4ff;
+        }
+
+        section#tela-4 {
+            border-left: 5px solid #ffab00;
+        }
+
+        section#tela-5 {
+            border-left: 5px solid #d500f9;
+        }
+
+        /* Responsividade */
+        @media (max-width: 600px) {
+            .form div {
+                flex: 1 1 100%;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SEÇÃO: Nomes -->
+    <section id="name"></section>
+
+    <!-- SEÇÃO: Status -->
+    <section id="status"></section>
+
+    <!-- TELA 1: Coleta de Informações -->
+    <section id="tela-1">
+        <h2>Coleta de Informações</h2>
+        <label for="lista">Lista de nomes:</label>
+        <textarea id="lista"></textarea>
+
+        <label for="tipo-conteudo">Tipo de Conteúdo:</label>
+        <select id="tipo-conteudo">
+            <option value="tv">Série</option>
+            <option value="movie">Filme</option>
+        </select>
+
+        <label for="tipo-conteudo-prinicipal">Categoria Principal:</label>
+        <select id="tipo-conteudo-prinicipal">
+            <option value="APPLE, Series">Séries APPLE</option>
+            <option value="Animes">Anime</option>
+            <option value="Novela">Novela</option>
+            <option value="Doramas">Doramas</option>
+            <option value="Doramas, Doramas Dublado">Doramas Dublado</option>
+            <option value="Doramas, Dorama Legendados">Doramas Legendado</option>
+            <option value="Dorama Coreano">Dorama Coreano</option>
+            <option value="Marvel, Filmes">Filmes Marvel</option>
+            <option value="Marvel, Series">Séries Marvel</option>
+            <option value="lançamento">Lançamentos</option>
+            <option value="Filme">Filme</option>
+            <option value="Netflix, Filmes">Filmes Netflix</option>
+            <option value="Netflix, Series">Séries Netflix</option>
+            <option value="HBO MAX, Filmes">Filmes HBO MAX</option>
+            <option value="HBO MAX, Series">Séries HBO MAX</option>
+            <option value="Disney, Filmes">Filmes Disney</option>
+            <option value="Disney, Series">Séries Disney</option>
+            <option value="Prime Video, Filmes">Filmes Prime Video</option>
+            <option value="Prime Video, Series">Séries Prime Video</option>
+            <option value="Globo Play, Filmes">Filmes Globo Play</option>
+            <option value="Globo Play, Series">Séries Globo Play</option>
+            <option value="WARNER, Filmes">Filmes WARNER</option>
+            <option value="MBC, Series">Séries MBC</option>
+            <option value="MBC, Dorama">Dorama MBC</option>
+            <option value="ABC, Serie">Serie ABC</option>
+            <option value="Paramount+, Serie">Serie Paramount+</option>
+            <option value="Filmes Variados, Filmes">Filmes Variados</option>
+            <option value="2024, Lancamento">2024</option>
+        </select>
+
+        <button id="init" class="btn-salvar">Ler Lista</button>
+    </section>
+
+    <!-- TELA 2: Lista de Itens Encontrados -->
+    <section id="tela-2">
+        <h2>Itens Encontrados</h2>
+        <!-- Os itens encontrados serão listados aqui -->
+    </section>
+
+    <!-- TELA 3: Dados Enviados -->
+    <section id="tela-3">
+        <h2>Dados Enviados</h2>
+        <div class="form">
+            <div>
+                <label for="nome">Nome</label>
+                <input id="nome" type="text">
+            </div>
+            <div>
+                <label for="capa">Capa</label>
+                <input id="capa" type="text">
+            </div>
+            <div>
+                <label for="categoria">Categoria</label>
+                <input id="categoria" type="text">
+            </div>
+            <div>
+                <label for="sinopse">Sinopse</label>
+                <input id="sinopse" type="text">
+            </div>
+            <div>
+                <label for="link">Link</label>
+                <input id="link" type="text">
+            </div>
+            <div>
+                <label for="tipo">Tipo</label>
+                <input id="tipo" type="text">
+            </div>
+            <div>
+                <label for="idioma">Idioma</label>
+                <input id="idioma" type="text">
+            </div>
+            <div>
+                <label for="temporadaTotal">Temporada Total</label>
+                <input id="temporadaTotal" type="text">
+            </div>
+            <div>
+                <label for="listaEps">Lista de Episódios</label>
+                <input id="listaEps" type="text">
+            </div>
+            <button id="btn-baserow" class="btn-salvar">Cadastrar</button>
+        </div>
+    </section>
+
+    <!-- TELA 4: Cadastro Final -->
+    <section id="tela-4">
+        <h2>Cadastro Final</h2>
+        <button onclick="cadastrarBaseRow()">Cadastrar no APP</button>
+    </section>
+
+    <!-- TELA 5: Botão de Pular -->
+    <section id="tela-5">
+        <h2>Pular</h2>
+        <button onclick="pular()">Pular</button>
+    </section>
+
+    <script src="./js/head.js"></script>
+</body>
+</html>
