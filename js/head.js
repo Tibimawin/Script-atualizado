@@ -122,17 +122,21 @@ if (user_vps === 0) {
 async function verificarVideo(url) {
     let targetUrl = url;
 
-    // Se estiver no Vercel, passa pelo proxy para evitar Mixed Content (HTTP em HTTPS)
+    // Se estiver no Vercel (hostname não local), passa pelo proxy para evitar Mixed Content (HTTP em HTTPS)
     if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && !window.location.hostname.startsWith('192.168.')) {
-        targetUrl = `/api/proxy?url=${encodeURIComponent(url)}`;
+        targetUrl = `/api/proxy?url=${encodeURIComponent(url)}&v=${Date.now()}`;
     }
 
     try {
-        const response = await fetch(targetUrl, { method: 'HEAD' });
-        // Se o status for entre 200 e 299, o arquivo existe
-        return response.ok;
+        // Usamos GET com Range para ser mais aceito por servidores de vídeo que HEAD
+        const response = await fetch(targetUrl, {
+            method: 'GET',
+            headers: { 'Range': 'bytes=0-0' },
+            cache: 'no-store'
+        });
+        return response.ok || response.status === 206;
     } catch (error) {
-        console.error("Erro ao verificar vídeo via proxy/fetch:", error);
+        console.error("Erro ao verificar vídeo:", error);
         return false;
     }
 }
@@ -750,49 +754,41 @@ function chunkArray(array, size) {
 
 //ESSA FUNÇÃO VERIFICA SE CONTEUDO EXISTE NO BASEROW
 async function buscaNameBaseRow(value) {
-
-    // Se o valor estiver vazio, retorna false para não travar o processo
     if (!value) return false;
 
-    option = {
+    const options = {
         method: 'GET',
         headers: {
+            'Authorization': `Token ${token}`,
+            'Accept': 'application/json'
+        },
+        cache: 'no-store'
+    };
 
-            Authorization: `Token ${token}`
-        }
-    }
-
-    // A URL deve ser codificada para funcionar corretamente, especialmente com espaços no nome
-    let urlBaseForRequest = url_base;
     let targetUrl = `${url_base}/api/database/rows/table/${id_conteudo}/?user_field_names=true&filter__field_${coluna_Nome_Conteudo}__equal=${encodeURIComponent(value)}`;
 
-    // Se estiver rodando no Vercel (hostname não local), usa o proxy
     if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && !window.location.hostname.startsWith('192.168.')) {
-        targetUrl = `/api/proxy?url=${encodeURIComponent(targetUrl)}`;
+        targetUrl = `/api/proxy?url=${encodeURIComponent(targetUrl)}&v=${Date.now()}`;
     }
 
-    const request = await fetch(targetUrl, option); // REALIZA A REQUISIÇÃO
-
-    if (request.ok) { //VERIFICA SE FOI FEITA COM SUCESSO
-
-        let response = await request.json();
-
-        if (response.count === 0) //VERIFICA SE FOI ENCONTRADO ALGO
-        {
-
-            console.log(`Conteúdo "${value}" não encontrado (OK para prosseguir)`);
+    try {
+        const request = await fetch(targetUrl, options);
+        if (request.ok) {
+            const response = await request.json();
+            if (response.count === 0) {
+                console.log(`Conteúdo "${value}" não encontrado.`);
+                return false;
+            } else {
+                console.log(`Conteúdo "${value}" já existe.`);
+                return true;
+            }
+        } else {
+            const errorText = await request.text();
+            console.error("Erro na busca do BaseRow:", errorText);
             return false;
-        } else { //FALSE SE ALGO FOR ENCONTRADO
-
-            console.log(`Conteúdo "${value}" já encontrado, pulando...`);
-            return true;
         }
-
-    } else {
-
-        console.error("Erro na busca do BaseRow:", await request.text());
-        return false; //RETORNA FALSE SE DER FALHA (Permite que o processo tente cadastrar)
+    } catch (error) {
+        console.error("Falha na requisição de busca:", error);
+        return false;
     }
-
-
 }
