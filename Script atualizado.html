@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -46,7 +47,9 @@
             color: #b0bec5;
         }
 
-        textarea, input, select {
+        textarea,
+        input,
+        select {
             width: 100%;
             padding: 10px;
             margin: 10px 0 20px 0;
@@ -58,7 +61,9 @@
             transition: border-color 0.3s ease;
         }
 
-        textarea:focus, input:focus, select:focus {
+        textarea:focus,
+        input:focus,
+        select:focus {
             border-color: #76ff03;
             outline: none;
         }
@@ -94,6 +99,7 @@
             from {
                 opacity: 0;
             }
+
             to {
                 opacity: 1;
             }
@@ -104,6 +110,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -151,7 +158,9 @@
         }
     </style>
 </head>
-<body>
+
+<body onload="Auth.protect()">
+    <script src="./js/auth.js"></script>
 
     <!-- SEÇÃO: Nomes -->
     <section id="name"></section>
@@ -172,44 +181,44 @@
         </select>
 
         <label for="tipo-conteudo-prinicipal">Categoria Principal:</label>
-<select id="tipo-conteudo-prinicipal">
-    <optgroup label="Plataformas de Streaming">
-        <option value="Apple TV+, Series">Séries Apple TV+</option>
-        <option value="Netflix, Filmes">Filmes Netflix</option>
-        <option value="Netflix, Series">Séries Netflix</option>
-        <option value="HBO MAX, Filmes">Filmes HBO MAX</option>
-        <option value="HBO MAX, Series">Séries HBO MAX</option>
-        <option value="Disney, Filmes">Filmes Disney</option>
-        <option value="Disney, Series">Séries Disney</option>
-        <option value="Prime Video, Filmes">Filmes Prime Video</option>
-        <option value="Prime Video, Series">Séries Prime Video</option>
-        <option value="Globo Play, Filmes">Filmes Globo Play</option>
-        <option value="Globo Play, Series">Séries Globo Play</option>
-    </optgroup>
-    <optgroup label="Gêneros">
-        <option value="Anime">Anime</option>
-        <option value="Novela">Novela</option>
-        <option value="Dorama">Dorama</option>
-        <option value="Dorama Coreano">Dorama Coreano</option>
-    </optgroup>
-    <optgroup label="Estúdios e Franquias">
-        <option value="Marvel, Filmes">Filmes Marvel</option>
-        <option value="Marvel, Series">Séries Marvel</option>
-        <option value="WARNER, Filmes">Filmes WARNER</option>
-    </optgroup>
-    <optgroup label="Outros">
-        <option value="lançamento">Lançamentos</option>
-        <option value="Filme">Filme</option>
-        <option value="Filmes Variados, Filmes">Filmes Variados</option>
-        <option value="2024, Lancamento">2024</option>
-    </optgroup>
-    <optgroup label="Canais e Redes">
-        <option value="MBC, Series">Séries MBC</option>
-        <option value="MBC, Dorama">Dorama MBC</option>
-        <option value="ABC, Serie">Serie ABC</option>
-        <option value="Paramount+, Serie">Serie Paramount+</option>
-    </optgroup>
-</select>
+        <select id="tipo-conteudo-prinicipal">
+            <optgroup label="Plataformas de Streaming">
+                <option value="Apple TV+, Series">Séries Apple TV+</option>
+                <option value="Netflix, Filmes">Filmes Netflix</option>
+                <option value="Netflix, Series">Séries Netflix</option>
+                <option value="HBO MAX, Filmes">Filmes HBO MAX</option>
+                <option value="HBO MAX, Series">Séries HBO MAX</option>
+                <option value="Disney, Filmes">Filmes Disney</option>
+                <option value="Disney, Series">Séries Disney</option>
+                <option value="Prime Video, Filmes">Filmes Prime Video</option>
+                <option value="Prime Video, Series">Séries Prime Video</option>
+                <option value="Globo Play, Filmes">Filmes Globo Play</option>
+                <option value="Globo Play, Series">Séries Globo Play</option>
+            </optgroup>
+            <optgroup label="Gêneros">
+                <option value="Anime">Anime</option>
+                <option value="Novela">Novela</option>
+                <option value="Dorama">Dorama</option>
+                <option value="Dorama Coreano">Dorama Coreano</option>
+            </optgroup>
+            <optgroup label="Estúdios e Franquias">
+                <option value="Marvel, Filmes">Filmes Marvel</option>
+                <option value="Marvel, Series">Séries Marvel</option>
+                <option value="WARNER, Filmes">Filmes WARNER</option>
+            </optgroup>
+            <optgroup label="Outros">
+                <option value="lançamento">Lançamentos</option>
+                <option value="Filme">Filme</option>
+                <option value="Filmes Variados, Filmes">Filmes Variados</option>
+                <option value="2024, Lancamento">2024</option>
+            </optgroup>
+            <optgroup label="Canais e Redes">
+                <option value="MBC, Series">Séries MBC</option>
+                <option value="MBC, Dorama">Dorama MBC</option>
+                <option value="ABC, Serie">Serie ABC</option>
+                <option value="Paramount+, Serie">Serie Paramount+</option>
+            </optgroup>
+        </select>
 
 
         <button id="init" class="btn-salvar">Ler Lista</button>
@@ -280,4 +289,5 @@
 
     <script src="./js/head.js"></script>
 </body>
+
 </html>

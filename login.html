@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Automação de Catálogo</title>
+    <style>
+        :root {
+            --primary-color: #76ff03;
+            --bg-color: #0a0a0a;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-color: #ffffff;
+            --error-color: #ff5252;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(118, 255, 3, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(118, 255, 3, 0.05) 0%, transparent 40%);
+        }
+
+        .login-container {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            width: 100%;
+            max-width: 350px;
+            text-align: center;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-weight: 300;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            letter-spacing: 2px;
+        }
+
+        p {
+            color: #888;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.8em;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: white;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: rgba(0,0,0,0.5);
+            box-shadow: 0 0 10px rgba(118, 255, 3, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: black;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background: #64dd17;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(118, 255, 3, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        #message {
+            margin-top: 15px;
+            font-size: 0.85em;
+            min-height: 1.2em;
+            color: var(--error-color);
+        }
+
+        .logo {
+            font-size: 3em;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <div class="logo">🔒</div>
+        <h1>ACESSO</h1>
+        <p>Área restrita de gerenciamento</p>
+        
+        <form id="login-form">
+            <div class="input-group">
+                <label for="access-key">Chave de Segurança</label>
+                <input type="password" id="access-key" placeholder="••••••••" required>
+            </div>
+            
+            <button type="submit">Entrar no Sistema</button>
+            <div id="message"></div>
+        </form>
+    </div>
+
+    <script src="./js/auth.js"></script>
+    <script>
+        // Lógica local simples para integrar com o auth.js
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const key = document.getElementById('access-key').value;
+            const message = document.getElementById('message');
+            
+            if (Auth.login(key)) {
+                window.location.href = 'index.html';
+            } else {
+                message.textContent = 'Chave de segurança inválida.';
+                document.getElementById('access-key').value = '';
+            }
+        });
+
+        // Se já estiver logado, vai direto pro index
+        if (Auth.check()) {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
